@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: linum-server
+  datasource:
+    url: jdbc:postgresql://localhost:5432/linum
+    username: linum
+    password: linum
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+server:
+  port: 8080
+
+linum:
+  security:
+    agent-token: "test-agent-token-123"
