@@ -8,7 +8,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "host_repositories")
 @Data
-public class HostRepository {
+public class HostRepo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

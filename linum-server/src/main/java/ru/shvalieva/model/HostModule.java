@@ -19,7 +19,7 @@ public class HostModule {
 
     @ManyToOne
     @JoinColumn(name = "module_id", nullable = false)
-    private Module module;
+    private ModuleEntity moduleEntity;
 
     private String version;
     private Instant updatedAt;

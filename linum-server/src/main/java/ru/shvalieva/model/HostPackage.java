@@ -19,7 +19,7 @@ public class HostPackage {
 
     @ManyToOne
     @JoinColumn(name = "package_id", nullable = false)
-    private Package aPackage;
+    private PackageEntity packageEntity;
 
     private String version;
     private String architecture;

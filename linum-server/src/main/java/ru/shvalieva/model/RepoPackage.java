@@ -19,7 +19,7 @@ public class RepoPackage {
 
     @ManyToOne
     @JoinColumn(name = "package_id", nullable = false)
-    private Package aPackage;
+    private PackageEntity aPackageEntity;
 
     @Column(nullable = false)
     private String latestVersion;

@@ -7,7 +7,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "modules")
 @Data
-public class Module {
+public class ModuleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
