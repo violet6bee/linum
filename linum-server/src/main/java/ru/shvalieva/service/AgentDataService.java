@@ -55,9 +55,9 @@ public class AgentDataService {
             processModules(host, dto.getModules());
         }
 
-        // Обновить время последнего обновления
+        // Обновить время последнего обновления (хост уже управляемый)
         host.setLastUpdated(Instant.now());
-        hostRepository.save(host);
+        hostRepository.save(host); // Сохраняем изменения (можно не вызывать, если хост уже в контексте, но для надёжности оставим)
     }
 
     private Host createNewHost(AgentDataDto dto) {
@@ -70,7 +70,7 @@ public class AgentDataService {
     private void updateHostInfo(Host host, AgentDataDto dto) {
         // Используем hostId как имя хоста (можно улучшить)
         host.setName(dto.getHostId());
-        // IP-адрес, пока заглушка
+        // IP-адрес можно получить из запроса, пока заглушка
         host.setIpAddress("0.0.0.0");
         if (dto.getOsInfo() != null) {
             // Просто сохраняем как строку для начала
@@ -82,7 +82,7 @@ public class AgentDataService {
 
     private void processPackages(Host host, List<AgentDataDto.PackageDto> packages) {
         for (AgentDataDto.PackageDto pkgDto : packages) {
-            // Найти или создать пакет
+            // Найти или создать пакет в справочнике
             PackageEntity packageEntity = packageEntityRepository.findByName(pkgDto.getName())
                     .orElseGet(() -> {
                         PackageEntity newPkg = new PackageEntity();
@@ -145,7 +145,7 @@ public class AgentDataService {
 
     private void processModules(Host host, List<AgentDataDto.ModuleDto> modules) {
         for (AgentDataDto.ModuleDto modDto : modules) {
-            // Найти или создать модуль
+            // Найти или создать модуль в справочнике
             ModuleEntity moduleEntity = moduleEntityRepository.findByName(modDto.getName())
                     .orElseGet(() -> {
                         ModuleEntity newMod = new ModuleEntity();

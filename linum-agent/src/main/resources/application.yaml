@@ -1,0 +1,16 @@
+agent:
+  server-url: "http://localhost:8080/api/v1/data"
+  token: "test-agent-token-123"
+  host-id: "test-host-001"
+  interval-seconds: 60
+
+spring:
+  main:
+    web-application-type: none
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    ru.shvalieva: DEBUG

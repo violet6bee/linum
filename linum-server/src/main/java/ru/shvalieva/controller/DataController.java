@@ -18,8 +18,8 @@ public class DataController {
     @PostMapping
     public ResponseEntity<String> receiveAgentData(@RequestBody AgentDataDto data) {
 
-        log.info("Received data from agent: {}", data);
+        log.info("Данные получены от агента: {}", data);
         agentDataService.processAgentData(data);
-        return ResponseEntity.ok("Data received");
+        return ResponseEntity.ok("Данные получены");
     }
 }
