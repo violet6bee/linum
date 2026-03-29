@@ -15,6 +15,7 @@
     <modules>
         <module>linum-server</module>
         <module>linum-agent</module>
+        <module>linum-frontend</module>
     </modules>
 
     <parent>

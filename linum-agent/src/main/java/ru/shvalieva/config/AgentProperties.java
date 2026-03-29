@@ -11,5 +11,5 @@ public class AgentProperties {
     private String serverUrl;
     private String token;
     private String hostId;
-    private long intervalSeconds = 3600;
+    private long intervalMs;
 }

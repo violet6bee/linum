@@ -18,7 +18,7 @@ public class ScheduledTasks {
     private final DataSender dataSender;
     private final AgentProperties properties;
 
-    @Scheduled(fixedDelayString = "#{@agentProperties.intervalSeconds * 1000}")
+    @Scheduled(fixedDelayString = "${agent.interval-ms}")
     public void collectAndSend() {
         log.info("Начало сбора данных для хоста: {}", properties.getHostId());
         AgentDataDto data = systemCollector.collect(properties.getHostId(), properties.getToken());

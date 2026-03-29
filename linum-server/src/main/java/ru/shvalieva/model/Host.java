@@ -18,7 +18,10 @@ public class Host {
 
     private String name;
     private String ipAddress;
+
+    @Column(columnDefinition = "TEXT")
     private String osInfo;
+
     private String kernelVersion;
     private String architecture;
     private Instant firstSeen;

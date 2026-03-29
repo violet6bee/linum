@@ -9,8 +9,8 @@ import ru.shvalieva.config.AgentProperties;
 @SpringBootApplication
 @EnableScheduling
 @EnableConfigurationProperties(AgentProperties.class)
-public class AgentApplication {
+public class LinumAgentApplication {
     public static void main(String[] args) {
-        SpringApplication.run(AgentApplication.class, args);
+        SpringApplication.run(LinumAgentApplication.class, args);
     }
 }

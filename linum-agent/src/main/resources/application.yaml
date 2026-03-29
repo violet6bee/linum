@@ -2,7 +2,7 @@ agent:
   server-url: "http://localhost:8080/api/v1/data"
   token: "test-agent-token-123"
   host-id: "test-host-001"
-  interval-seconds: 60
+  interval-ms: 30000
 
 spring:
   main:
