@@ -26,4 +26,7 @@ public class Host {
     private String architecture;
     private Instant firstSeen;
     private Instant lastUpdated;
+
+    @Column(columnDefinition = "TEXT")
+    private String osPrettyName;
 }

@@ -12,6 +12,7 @@ import ru.shvalieva.repository.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -75,9 +76,27 @@ public class AgentDataService {
         if (dto.getOsInfo() != null) {
             // Просто сохраняем как строку для начала
             host.setOsInfo(dto.getOsInfo().toString());
+            String pretty = extractPrettyName(dto.getOsInfo());
+            log.info("Извлечение имени: {}", pretty);
+            host.setOsPrettyName(pretty);
         }
         host.setKernelVersion(dto.getKernelVersion());
         host.setArchitecture(dto.getArchitecture());
+    }
+
+    private String extractPrettyName(Map<String, String> osInfo) {
+        if (osInfo == null) return "Unknown OS";
+        String pretty = osInfo.get("PRETTY_NAME");
+        if (pretty != null && !pretty.isEmpty()) {
+            return pretty;
+        }
+        String name = osInfo.get("NAME");
+        String version = osInfo.get("VERSION_ID");
+        if (name != null && version != null) {
+            return name + " " + version;
+        }
+        if (name != null) return name;
+        return "Unknown OS";
     }
 
     private void processPackages(Host host, List<AgentDataDto.PackageDto> packages) {
