@@ -9,8 +9,10 @@ import ru.shvalieva.dto.HostSummaryDto;
 import ru.shvalieva.dto.StatsDto;
 import ru.shvalieva.model.Host;
 import ru.shvalieva.model.HostPackage;
+import ru.shvalieva.model.HostUpgradable;
 import ru.shvalieva.repository.HostPackageRepository;
 import ru.shvalieva.repository.HostRepository;
+import ru.shvalieva.repository.HostUpgradableRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -25,12 +27,13 @@ public class HostController {
 
     private final HostRepository hostRepository;
     private final HostPackageRepository hostPackageRepository;
+    private final HostUpgradableRepository hostUpgradableRepository;
 
     @GetMapping("/hosts")
     public ResponseEntity<List<HostSummaryDto>> getHosts() {
         List<Host> hosts = hostRepository.findAll();
         List<HostSummaryDto> result = hosts.stream().map(host -> {
-            int outdatedCount = 0;
+            int outdatedCount = hostUpgradableRepository.findByHost(host).size();
             return HostSummaryDto.builder()
                     .id(host.getId())
                     .name(host.getName())
@@ -49,6 +52,7 @@ public class HostController {
         if (host == null) {
             return ResponseEntity.notFound().build();
         }
+        // Список установленных пакетов
         List<HostPackage> hostPackages = hostPackageRepository.findByHost(host);
         List<HostDetailsDto.PackageInfo> packages = hostPackages.stream()
                 .map(hp -> HostDetailsDto.PackageInfo.builder()
@@ -58,7 +62,15 @@ public class HostController {
                         .build())
                 .collect(Collectors.toList());
 
-        List<HostDetailsDto.UpgradablePackageInfo> upgradable = List.of();
+        // Список пакетов, доступных к обновлению
+        List<HostUpgradable> upgradable = hostUpgradableRepository.findByHost(host);
+        List<HostDetailsDto.UpgradablePackageInfo> upgradablePackages = upgradable.stream()
+                .map(up -> HostDetailsDto.UpgradablePackageInfo.builder()
+                        .name(up.getPackageEntity().getName())
+                        .currentVersion(up.getCurrentVersion())
+                        .targetVersion(up.getTargetVersion())
+                        .build())
+                .collect(Collectors.toList());
 
         HostDetailsDto dto = HostDetailsDto.builder()
                 .id(host.getId())
@@ -69,7 +81,7 @@ public class HostController {
                 .architecture(host.getArchitecture())
                 .lastUpdated(host.getLastUpdated())
                 .packages(packages)
-                .upgradablePackages(upgradable)
+                .upgradablePackages(upgradablePackages)
                 .build();
         return ResponseEntity.ok(dto);
     }
@@ -77,8 +89,13 @@ public class HostController {
     @GetMapping("/stats")
     public ResponseEntity<StatsDto> getStats() {
         long totalHosts = hostRepository.count();
-        long outdatedHosts = 0;
-        Map<String, Long> osCount = hostRepository.findAll().stream()
+        // Подсчёт хостов, у которых есть хотя бы один устаревший пакет
+        List<Host> allHosts = hostRepository.findAll();
+        long outdatedHosts = allHosts.stream()
+                .filter(host -> !hostUpgradableRepository.findByHost(host).isEmpty())
+                .count();
+        // Распределение по ОС
+        Map<String, Long> osCount = allHosts.stream()
                 .map(Host::getOsPrettyName)
                 .filter(s -> s != null && !s.isEmpty())
                 .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
