@@ -1,5 +1,6 @@
 package ru.shvalieva.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,10 @@ public class DataController {
     private final AgentDataService agentDataService;
 
     @PostMapping
-    public ResponseEntity<String> receiveAgentData(@RequestBody AgentDataDto data) {
-
-        log.info("Данные получены от агента: {}", data);
-        agentDataService.processAgentData(data);
+    public ResponseEntity<String> receiveAgentData(@RequestBody AgentDataDto data, HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+        log.info("Данные получены от агента {} с IP {}", data.getHostId(), ipAddress);
+        agentDataService.processAgentData(data, ipAddress);
         return ResponseEntity.ok("Данные получены");
     }
 }

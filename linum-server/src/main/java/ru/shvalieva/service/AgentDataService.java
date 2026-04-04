@@ -30,7 +30,7 @@ public class AgentDataService {
     private final UpgradeService upgradeService;
 
     @Transactional
-    public void processAgentData(AgentDataDto dto) {
+    public void processAgentData(AgentDataDto dto, String ipAddress) {
         // 1. Найти или создать хост по токену, сразу сохраняя новый
         String token = dto.getToken();
         Host host = hostRepository.findByToken(token)
@@ -40,7 +40,7 @@ public class AgentDataService {
                 });
 
         // 2. Обновить информацию о хосте (для уже существующего или только что сохранённого)
-        updateHostInfo(host, dto);
+        updateHostInfo(host, dto, ipAddress);
 
         // 3. Обработать пакеты
         if (dto.getPackages() != null) {
@@ -70,11 +70,11 @@ public class AgentDataService {
         return host;
     }
 
-    private void updateHostInfo(Host host, AgentDataDto dto) {
+    private void updateHostInfo(Host host, AgentDataDto dto, String ipAddress) {
         // Используем hostId как имя хоста (можно улучшить)
         host.setName(dto.getHostId());
         // IP-адрес можно получить из запроса, пока заглушка
-        host.setIpAddress("0.0.0.0");
+        host.setIpAddress(ipAddress);
         if (dto.getOsInfo() != null) {
             // Просто сохраняем как строку для начала
             host.setOsInfo(dto.getOsInfo().toString());
