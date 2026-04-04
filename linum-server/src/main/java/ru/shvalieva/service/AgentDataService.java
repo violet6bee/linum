@@ -27,6 +27,7 @@ public class AgentDataService {
     private final HostRepoRepository hostRepoRepository;
     private final ModuleEntityRepository moduleEntityRepository;
     private final HostModuleRepository hostModuleRepository;
+    private final UpgradeService upgradeService;
 
     @Transactional
     public void processAgentData(AgentDataDto dto) {
@@ -59,6 +60,7 @@ public class AgentDataService {
         // Обновить время последнего обновления (хост уже управляемый)
         host.setLastUpdated(Instant.now());
         hostRepository.save(host); // Сохраняем изменения (можно не вызывать, если хост уже в контексте, но для надёжности оставим)
+        upgradeService.computeOutdatedPackagesForHost(host);
     }
 
     private Host createNewHost(AgentDataDto dto) {
