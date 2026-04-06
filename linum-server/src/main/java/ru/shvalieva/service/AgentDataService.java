@@ -73,7 +73,6 @@ public class AgentDataService {
     private void updateHostInfo(Host host, AgentDataDto dto, String ipAddress) {
         // Используем hostId как имя хоста (можно улучшить)
         host.setName(dto.getHostId());
-        // IP-адрес можно получить из запроса, пока заглушка
         host.setIpAddress(ipAddress);
         if (dto.getOsInfo() != null) {
             // Просто сохраняем как строку для начала
