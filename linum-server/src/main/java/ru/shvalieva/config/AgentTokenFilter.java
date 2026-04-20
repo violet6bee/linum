@@ -4,20 +4,21 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.shvalieva.repository.HostRepository;
 
 import java.io.IOException;
 import java.util.Collections;
 
+@Component
+@RequiredArgsConstructor
 public class AgentTokenFilter extends OncePerRequestFilter {
 
-    private final String validToken;
-
-    public AgentTokenFilter(String validToken) {
-        this.validToken = validToken;
-    }
+    private final HostRepository hostRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -28,11 +29,18 @@ public class AgentTokenFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            if (validToken.equals(token)) {
+            // Проверяем, существует ли хост с таким токеном
+            if (hostRepository.findByToken(token).isPresent()) {
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken("agent", null, Collections.emptyList());
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Неправильный токен");
+                return;
             }
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Отсутствует заголовок авторизации");
+            return;
         }
 
         filterChain.doFilter(request, response);

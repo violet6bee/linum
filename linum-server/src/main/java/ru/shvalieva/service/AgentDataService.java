@@ -38,7 +38,9 @@ public class AgentDataService {
                     Host newHost = createNewHost(dto);
                     return hostRepository.save(newHost); // Сохраняем новый хост
                 });
-
+        if (host.getFirstSeen() == null) {
+            host.setFirstSeen(Instant.now());
+        }
         // 2. Обновить информацию о хосте (для уже существующего или только что сохранённого)
         updateHostInfo(host, dto, ipAddress);
 
@@ -86,7 +88,7 @@ public class AgentDataService {
     }
 
     private String extractPrettyName(Map<String, String> osInfo) {
-        if (osInfo == null) return "Unknown OS";
+        if (osInfo == null) return "Неизвестная ОС";
         String pretty = osInfo.get("PRETTY_NAME");
         if (pretty != null && !pretty.isEmpty()) {
             return pretty;
@@ -97,7 +99,7 @@ public class AgentDataService {
             return name + " " + version;
         }
         if (name != null) return name;
-        return "Unknown OS";
+        return "Неизвестная ОС";
     }
 
     private void processPackages(Host host, List<AgentDataDto.PackageDto> packages) {

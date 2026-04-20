@@ -27,8 +27,7 @@ public class RepoSyncService {
     private final RepoPackageRepository repoPackageRepository;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // Запуск раз в сутки
-   @Scheduled(cron = "0 0 3 * * ?") // каждый день в 8 утра
+   @Scheduled(cron = "0 0 8 1 */2 ?") // каждый нечетный месяц, 1-го числа в 8 часов
     @Transactional
     public void syncAllRepositories() {
         List<Repository> repositories = repositoryRepository.findAll();
@@ -66,7 +65,6 @@ public class RepoSyncService {
         }
     }
 
-    // TODO: вынести в фоновую задачу
     private void parsePackagesGz(byte[] gzData, Repository repo) {
         try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(gzData));
              BufferedReader reader = new BufferedReader(new InputStreamReader(gzip))) {

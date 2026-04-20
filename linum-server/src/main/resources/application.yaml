@@ -18,6 +18,14 @@ spring:
 server:
   port: 8080
 
-linum:
-  security:
-    agent-token: "test-agent-token-123"
+#linum:
+#  security:
+#    agent-token: ${AGENT_TOKEN:test-agent-token-123}
+
+admin:
+  username: ${ADMIN_NAME:admin}
+  password: ${ADMIN_PASSWORD:admin123}
+
+jwt:
+  secret: lKcSZ0Vl23T7U9F2B7b/Qx9xH8m/zD63vW5Y4t/5Xl0J5v0bK6w74+0q4hI8rG1Fm67k8b9aM7/vY9V+k6T64eQ==
+  expiration: 86400000 # 24 часа в миллисекундах

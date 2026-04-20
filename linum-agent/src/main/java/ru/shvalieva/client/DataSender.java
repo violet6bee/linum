@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.shvalieva.dto.AgentDataDto;
+import ru.shvalieva.service.CacheService;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,6 +19,7 @@ import java.time.Duration;
 public class DataSender {
 
     private final ObjectMapper objectMapper;
+    private final CacheService cacheService;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
@@ -31,7 +33,7 @@ public class DataSender {
                     .uri(URI.create(serverUrl))
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Bearer " + data.getToken())
-                    .timeout(Duration.ofSeconds(30))
+                    .timeout(Duration.ofSeconds(60))
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
@@ -41,11 +43,26 @@ public class DataSender {
                 return true;
             } else {
                 log.error("Не удалось отправить данные, статус: {}, ответ: {}", response.statusCode(), response.body());
+                cacheService.saveToCache(data);
                 return false;
             }
         } catch (Exception e) {
             log.error("Ошибка при отправке данных", e);
+            cacheService.saveToCache(data);
             return false;
         }
+    }
+
+    public boolean sendCachedData(String serverUrl, java.io.File cacheFile) {
+        AgentDataDto data = cacheService.loadFromCache(cacheFile);
+        if (data == null) {
+            cacheService.deleteCacheFile(cacheFile);
+            return false;
+        }
+        boolean success = sendData(serverUrl, data);
+        if (success) {
+            cacheService.deleteCacheFile(cacheFile);
+        }
+        return success;
     }
 }
